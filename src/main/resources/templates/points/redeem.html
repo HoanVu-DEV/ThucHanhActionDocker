@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đổi Điểm Thưởng - TGDD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f4f4f4; font-family: Arial, sans-serif; }
+
+        .page-header {
+            background: linear-gradient(135deg, #c92127, #e67e22);
+            padding: 20px 0;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .page-header h1 { font-size: 24px; font-weight: bold; margin: 0; }
+        .page-header a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 14px; }
+        .page-header a:hover { color: white; }
+
+        .card-custom {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .points-badge {
+            background: linear-gradient(135deg, #ffc107, #e67e22);
+            border-radius: 16px;
+            padding: 25px;
+            text-align: center;
+            color: white;
+            margin-bottom: 25px;
+        }
+        .points-badge .points-number {
+            font-size: 60px;
+            font-weight: bold;
+            line-height: 1;
+        }
+        .points-badge .points-label { font-size: 16px; opacity: 0.9; margin-top: 5px; }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-row .label { color: #666; }
+        .info-row .value { font-weight: bold; color: #333; }
+
+        .select-custom {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .select-custom:focus { border-color: #c92127; outline: none; }
+
+        .btn-primary-tgdd {
+            background: #c92127;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-primary-tgdd:hover { background: #a01b20; color: white; transform: translateY(-2px); }
+        .btn-primary-tgdd:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        .discount-preview {
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+        }
+        .discount-preview.show { display: block; }
+
+        .alert-custom {
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+            color: #555;
+        }
+        .rule-item i { color: #e67e22; margin-top: 2px; flex-shrink: 0; }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <div class="container">
+            <a href="/products"><i class="fas fa-arrow-left"></i> Về trang chủ</a>
+            <h1 style="margin-top: 10px;"><i class="fas fa-coins"></i> Đổi Điểm Thưởng</h1>
+        </div>
+    </div>
+
+    <div class="container" style="max-width: 700px;">
+
+        <!-- Alerts -->
+        <div th:if="${successMsg}" class="alert alert-success alert-custom">
+            <i class="fas fa-check-circle"></i> <span th:text="${successMsg}"></span>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-custom">
+            <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+        </div>
+
+        <!-- Points balance -->
+        <div class="card-custom">
+            <div class="points-badge">
+                <div><i class="fas fa-coins" style="font-size:32px; margin-bottom:8px;"></i></div>
+                <div class="points-number" th:text="${points}">0</div>
+                <div class="points-label">điểm thưởng tích lũy</div>
+            </div>
+
+            <div class="info-row">
+                <span class="label">📧 Email nhận OTP</span>
+                <span class="value" th:text="${user.email}">email@...</span>
+            </div>
+            <div class="info-row">
+                <span class="label">🔄 Quy đổi</span>
+                <span class="value">2 điểm = giảm 15,000₫</span>
+            </div>
+            <div class="info-row">
+                <span class="label">💰 Có thể đổi tối đa</span>
+                <span class="value" style="color: #c92127;"
+                      th:text="${maxPairs} + ' lần đổi = ' + ${#numbers.formatDecimal(maxDiscount, 0, 'COMMA', 0, 'POINT')} + '₫'">0</span>
+            </div>
+        </div>
+
+        <!-- Redeem form -->
+        <div class="card-custom" th:if="${points >= 2}">
+            <h5 style="font-weight: bold; margin-bottom: 20px;"><i class="fas fa-exchange-alt"></i> Thực hiện đổi điểm</h5>
+
+            <form th:action="@{/points/send-otp}" method="post">
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: bold; font-size: 14px; margin-bottom: 8px; display: block;">
+                        Chọn số điểm muốn đổi:
+                    </label>
+                    <select name="redeemPairs" id="redeemPairs" class="select-custom" onchange="updatePreview()">
+                        <option value="">-- Chọn số lần đổi --</option>
+                        <option th:each="i : ${#numbers.sequence(1, maxPairs)}"
+                                th:value="${i}"
+                                th:text="${i*2} + ' điểm → giảm ' + ${#numbers.formatDecimal(i * 15000, 0, 'COMMA', 0, 'POINT')} + '₫'">
+                        </option>
+                    </select>
+                </div>
+
+                <div id="discountPreview" class="discount-preview">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-gift" style="color: #4caf50; font-size: 24px;"></i>
+                        <div>
+                            <div style="font-weight: bold; color: #2e7d32; font-size: 16px;" id="previewText">-0₫</div>
+                            <div style="font-size: 12px; color: #666;" id="previewPoints">Sử dụng 0 điểm</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 5px; font-size: 12px; color: #888; margin-bottom: 20px;">
+                    <i class="fas fa-info-circle"></i>
+                    Sau khi chọn, hệ thống sẽ gửi mã OTP 6 số về email <strong th:text="${user.email}"></strong> để xác thực.
+                </div>
+
+                <button type="submit" class="btn-primary-tgdd" id="submitBtn" disabled>
+                    <i class="fas fa-paper-plane"></i> Gửi mã OTP xác thực
+                </button>
+            </form>
+        </div>
+
+        <!-- Zero points notice -->
+        <div class="card-custom" th:unless="${points >= 2}">
+            <div style="text-align: center; padding: 20px;">
+                <i class="fas fa-coins" style="font-size: 48px; color: #ddd; margin-bottom: 15px;"></i>
+                <h5 style="color: #999;">Chưa đủ điểm để đổi</h5>
+                <p style="color: #aaa; font-size: 14px;">Bạn cần ít nhất <strong>2 điểm</strong> để thực hiện đổi.<br>Hãy mua sắm để tích thêm điểm nhé!</p>
+                <a href="/products" class="btn-primary-tgdd" style="display: inline-flex; width: auto; padding: 12px 25px;">
+                    <i class="fas fa-shopping-cart"></i> Đi mua sắm
+                </a>
+            </div>
+        </div>
+
+        <!-- Rules -->
+        <div class="card-custom">
+            <h6 style="font-weight: bold; color: #e67e22; margin-bottom: 15px;"><i class="fas fa-info-circle"></i> Quy tắc tích & đổi điểm</h6>
+            <div class="rule-item"><i class="fas fa-star"></i><span>Cứ <strong>15,000₫</strong> tiền hàng (không tính phí ship) → tích được <strong>2 điểm</strong></span></div>
+            <div class="rule-item"><i class="fas fa-exchange-alt"></i><span>Cứ <strong>2 điểm</strong> → giảm <strong>15,000₫</strong> cho đơn hàng tiếp theo</span></div>
+            <div class="rule-item"><i class="fas fa-shield-alt"></i><span>Cần xác thực OTP qua email mỗi lần đổi điểm để bảo mật tài khoản</span></div>
+            <div class="rule-item"><i class="fas fa-clock"></i><span>Mã OTP có hiệu lực <strong>5 phút</strong> sau khi gửi</span></div>
+        </div>
+    </div>
+
+    <script>
+        function updatePreview() {
+            const select = document.getElementById('redeemPairs');
+            const btn = document.getElementById('submitBtn');
+            const preview = document.getElementById('discountPreview');
+            const previewText = document.getElementById('previewText');
+            const previewPoints = document.getElementById('previewPoints');
+            const val = parseInt(select.value);
+
+            if (val && val > 0) {
+                const discount = val * 15000;
+                const points = val * 2;
+                previewText.textContent = '- ' + discount.toLocaleString('vi-VN') + '₫';
+                previewPoints.textContent = 'Sử dụng ' + points + ' điểm';
+                preview.classList.add('show');
+                btn.disabled = false;
+            } else {
+                preview.classList.remove('show');
+                btn.disabled = true;
+            }
+        }
+    </script>
+</body>
+</html>

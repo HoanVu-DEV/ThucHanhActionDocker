@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đặt hàng thành công - Thế Giới Di Động</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .success-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: #28a745;
+            margin-bottom: 20px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .success-desc {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .btn-home {
+            background: #c92127;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .btn-home:hover {
+            background: #a61b20;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="success-card">
+        <i class="fas fa-check-circle success-icon"></i>
+        <div class="success-title">Đặt hàng thành công!</div>
+        <div class="success-desc">
+            <span th:if="${momoSuccess}">Thanh toán qua MoMo đã hoàn tất! 🎉<br></span>
+            Cảm ơn bạn đã mua sắm tại Thế Giới Di Động. Đơn hàng của bạn đã được ghi nhận và sẽ sớm được nhân viên liên hệ xác nhận trong chốc lát.
+        </div>
+        <div th:if="${userPoints != null}" style="background: #fff8e1; border: 1px solid #ffc107; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
+            <i class="fas fa-coins" style="color: #ffc107; font-size: 20px; margin-right: 5px;"></i>
+            Điểm thưởng hiện tại của bạn: <strong style="color: #e67e22; font-size: 18px;" th:text="${userPoints}">0</strong> điểm
+            <div style="font-size: 12px; color: #888; margin-top: 4px;">Cứ 2 điểm = giảm 15,000₫ cho đơn hàng tiếp theo!</div>
+        </div>
+        <a href="/products" class="btn-home"><i class="fas fa-home"></i> Về trang chủ</a>
+    </div>
+</body>
+</html>

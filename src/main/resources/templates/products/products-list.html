@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Sản Phẩm - Thế Giới Di Động</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        /* Top Red Banner */
+        .top-banner {
+            background: linear-gradient(180deg, #c92127 0%, #d32f2f 100%);
+            padding: 8px 0;
+            text-align: center;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Header with Logo and Search */
+        .main-header {
+            background: #ffcc00;
+            padding: 12px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #c92127;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .logo i {
+            font-size: 32px;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-bar form {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 10px 45px 10px 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+            border-color: #c92127;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            color: #999;
+            font-size: 16px;
+            pointer-events: none;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 10px;
+            background: #c92127;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .clear-search:hover {
+            background: #a01b20;
+            transform: rotate(90deg);
+        }
+
+        .clear-search.show {
+            display: flex;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .header-btn {
+            background: transparent;
+            color: #333;
+            padding: 0;
+            border-radius: 0;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+
+        .header-btn:hover {
+            color: #c92127;
+        }
+
+        .header-btn i {
+            font-size: 18px;
+        }
+
+        .location-btn {
+            color: #333;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -10px;
+            background: #d70018;
+            color: white;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 1px 5px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+            border: 1px solid #fff;
+        }
+
+        /* Category Navigation Bar */
+        .category-nav {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            overflow: visible;
+            /* Changed from overflow-x: auto to allow dropdowns to overflow */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            position: relative;
+            z-index: 900;
+            /* Ensure the nav itself is above banners */
+        }
+
+        .category-nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            gap: 0;
+        }
+
+        .category-nav-item {
+            padding: 10px 18px;
+            color: #444;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .category-nav-item i {
+            font-size: 16px;
+        }
+
+        .category-nav-item:hover {
+            background: #fffbf0;
+            color: #c92127;
+        }
+
+        .category-nav-item.active {
+            color: #c92127;
+            border-bottom-color: #ffcc00;
+            background: #fffbf0;
+        }
+
+        /* Promotional Banner */
+        .promo-banner {
+            max-width: 1200px;
+            margin: 15px auto;
+            padding: 0 15px;
+        }
+
+        .promo-banner img {
+            width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ffcc00;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .add-btn {
+            background: #c92127;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            background: #a01b20;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(201, 33, 39, 0.3);
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+
+        .product-item {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: #f8f8f8;
+        }
+
+        .product-info {
+            padding: 12px;
+        }
+
+        .product-name {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 40px;
+            line-clamp: 2;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #c92127;
+            margin-bottom: 5px;
+        }
+
+        .product-category {
+            display: inline-block;
+            background: #fff3cd;
+            color: #856404;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+
+        .btn-edit {
+            background: #ffcc00;
+            color: #333;
+        }
+
+        .btn-edit:hover {
+            background: #e6b800;
+        }
+
+        .btn-delete {
+            background: #c92127;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #a01b20;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 12px;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        /* Product Type Tabs */
+        .product-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: transparent;
+            color: #666;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-btn:hover {
+            color: #c92127;
+        }
+
+        .tab-btn.active {
+            color: #c92127;
+            border-bottom-color: #ffcc00;
+        }
+
+        .tab-btn i {
+            font-size: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-wrap: wrap;
+            }
+
+            .search-bar {
+                order: 3;
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .category-nav-container {
+                overflow-x: scroll;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .product-name {
+                font-size: 13px;
+            }
+
+            .product-price {
+                font-size: 14px;
+            }
+        }
+
+        /* Promotion Badge */
+        .promo-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #c92127;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            animation: pulse 2s infinite;
+        }
+
+        /* ========== ANIMATIONS ========== */
+
+        /* Fade in animation for page load */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Slide up animation */
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Pulse animation for badges */
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* Bounce animation for add button */
+        @keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Shimmer effect for loading */
+        @keyframes shimmer {
+            0% {
+                background-position: -1000px 0;
+            }
+
+            100% {
+                background-position: 1000px 0;
+            }
+        }
+
+        /* Apply animations to elements */
+        .main-header {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .category-nav {
+            animation: fadeIn 0.6s ease-in;
+        }
+
+        .promo-banner {
+            animation: fadeIn 0.8s ease-in;
+        }
+
+        .promo-banner img {
+            transition: transform 0.3s ease;
+        }
+
+        .promo-banner img:hover {
+            transform: scale(1.02);
+        }
+
+        .product-item {
+            animation: slideUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        /* Stagger animation for product items */
+        .product-item:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .product-item:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .product-item:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .product-item:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        .product-item:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+        .product-item:nth-child(6) {
+            animation-delay: 0.35s;
+        }
+
+        .product-item:nth-child(7) {
+            animation-delay: 0.4s;
+        }
+
+        .product-item:nth-child(8) {
+            animation-delay: 0.45s;
+        }
+
+        .add-btn {
+            transition: all 0.3s ease;
+        }
+
+        .add-btn:hover {
+            animation: bounce 0.6s;
+        }
+
+        .product-image {
+            transition: transform 0.4s ease;
+        }
+
+        .product-item:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .category-nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-nav-item::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: #ffcc00;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+
+        .category-nav-item:hover::before {
+            width: 80%;
+        }
+
+        /* Hierarchical Category Menu */
+        .category-menu-item {
+            position: relative;
+            /* Remove relative from nav item if this is meant to be full width, or keep it for localized dropdown */
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .category-submenu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            /* Aligned left by default */
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            margin-top: 15px;
+            /* Added more space for the triangle */
+            padding: 15px;
+
+            /* Mega menu layout */
+            width: max-content;
+            max-width: 900px;
+            /* Made wider */
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+        }
+
+        /* Triangle Caret pointing up */
+        .category-submenu::after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 30px;
+            /* Positioned under the menu item icon/text roughly */
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        /* Triangle Caret Border */
+        .category-submenu::before {
+            content: '';
+            position: absolute;
+            top: -12px;
+            left: 29px;
+            border-left: 11px solid transparent;
+            border-right: 11px solid transparent;
+            border-bottom: 11px solid #e0e0e0;
+        }
+
+        .category-menu-item.active .category-submenu {
+            display: grid;
+            /* Toggled by Javascript */
+            animation: slideDown 0.2s ease-out;
+        }
+
+        .category-submenu a {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            text-align: center;
+            gap: 8px;
+            padding: 10px 5px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .category-submenu a:hover {
+            background: #fffbf0;
+            color: #c92127;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .category-submenu a i {
+            font-size: 28px;
+            color: #555;
+            transition: color 0.2s;
+        }
+
+        .category-submenu a:hover i {
+            color: #c92127;
+        }
+
+        .category-submenu a span {
+            font-size: 12px;
+            line-height: 1.3;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-action {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-action::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.4s, height 0.4s;
+        }
+
+        .btn-action:hover::after {
+            width: 200px;
+            height: 200px;
+        }
+
+        .search-bar input {
+            transition: all 0.3s ease;
+        }
+
+        .search-bar input:focus {
+            transform: scale(1.02);
+        }
+
+        .header-btn {
+            position: relative;
+        }
+
+        .header-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 6px;
+            background: linear-gradient(45deg, transparent, rgba(255, 204, 0, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .header-btn:hover::before {
+            opacity: 1;
+        }
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Loading shimmer effect */
+        .loading-shimmer {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Promotional Banner Image -->
+    <div style="width: 100%; overflow: hidden;">
+        <img src="https://cdnv2.tgdd.vn/mwg-static/tgdd/Banner/25/28/2528971e6119a5d6b12f5e9b03c11131.png"
+            alt="Banner khuyến mãi" style="width: 100%; display: block; max-height: 80px; object-fit: cover;"
+            onerror="this.style.display='none'">
+    </div>
+
+    <!-- Main Header -->
+    <div class="main-header">
+        <div class="header-container">
+            <a href="/products" class="logo">
+                <i class="fas fa-mobile-alt"></i>
+                <span>thegioididong</span>
+            </a>
+
+            <div class="search-bar">
+                <form th:action="@{/products}" method="get" id="searchForm">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" name="keyword" id="searchInput" th:value="${keyword}"
+                        placeholder="Bạn tìm gì...">
+                    <button type="button" class="clear-search" id="clearBtn" onclick="clearSearch()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="header-actions">
+                <a href="#" class="header-btn location-btn">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>Hồ Chí Minh</span>
+                </a>
+                <a sec:authorize="isAnonymous()" href="/login" class="header-btn">
+                    <i class="fas fa-user"></i>
+                    <span>Đăng nhập</span>
+                </a>
+                <a href="/cart" class="header-btn">
+                    <div style="position: relative; display: flex; align-items: center;">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-count" th:text="${cartCount != null ? cartCount : 0}">0</span>
+                    </div>
+                    <span style="margin-top: 2px;">Giỏ hàng</span>
+                </a>
+                <div sec:authorize="isAuthenticated()" style="display: flex; align-items: center; gap: 15px; border-left: 1px solid rgba(0,0,0,0.1); padding-left: 15px; margin-left: 5px;">
+                    <div class="header-btn" style="cursor: default; flex-direction: row; gap: 5px;">
+                        <i class="fas fa-user-circle" style="color: #333; font-size: 18px;"></i>
+                        <span sec:authentication="name" style="color: #333; font-weight: bold; max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">User</span>
+                    </div>
+                    <a href="/logout" class="header-btn" style="color: #c92127; flex-direction: row; gap: 5px;">
+                        <i class="fas fa-sign-out-alt" style="font-size: 18px;"></i>
+                        <span>Đăng xuất</span>
+                    </a>
+                </div>
+                <a sec:authorize="hasAnyAuthority('ADMIN','MANAGER')" href="/categories" class="header-btn">
+                    <i class="fas fa-list"></i>
+                    <span>Danh mục</span>
+                </a>
+                <a sec:authorize="hasAuthority('USER')" href="/points/redeem" class="header-btn" style="color: #e67e22;">
+                    <i class="fas fa-coins"></i>
+                    <span>Đổi điểm</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Navigation -->
+    <div class="category-nav">
+        <div class="category-nav-container">
+            <a href="/products" class="category-nav-item active">
+                <i class="fas fa-home"></i> Tất cả
+            </a>
+            <div th:each="category : ${parentCategories}" class="category-menu-item"
+                th:if="${category.children != null and !category.children.isEmpty()}">
+                <a href="javascript:void(0);" onclick="toggleSubmenu(event, this)" class="category-nav-item">
+                    <i th:class="${category.icon != null and !category.icon.isEmpty()} ? category.icon : 'fas fa-tag'"
+                        style="font-size: 16px;"></i>
+                    <span th:text="${category.name}">Category</span>
+                    <i class="fas fa-chevron-down" style="font-size: 12px; margin-left: 5px;"></i>
+                </a>
+                <div class="category-submenu">
+                    <a th:each="subcategory : ${category.children}" th:href="@{/products(category=${subcategory.id})}">
+                        <i
+                            th:class="${subcategory.icon != null and !subcategory.icon.isEmpty()} ? subcategory.icon : 'fas fa-dot-circle'"></i>
+                        <span th:text="${subcategory.name}">Subcategory</span>
+                    </a>
+
+                    <!-- Nút xem tất cả sản phẩm của danh mục cha -->
+                    <!-- <a th:href="@{/products(category=${category.id})}" style="background: #fff3cd; grid-column: 1 / -1; flex-direction: row; color: #856404; font-weight: bold; border-radius: 8px; margin-top: 10px;">
+                        <span>Xem tất cả <span th:text="${category.name}"></span></span>
+                        <i class="fas fa-arrow-right" style="font-size: 14px; margin-left: 5px; color: #856404;"></i>
+                    </a> -->
+                </div>
+            </div>
+            <a th:each="category : ${parentCategories}"
+                th:if="${category.children == null or category.children.isEmpty()}"
+                th:href="@{/products(category=${category.id})}" class="category-nav-item">
+                <i th:class="${category.icon != null and !category.icon.isEmpty()} ? category.icon : 'fas fa-tag'"
+                    style="font-size: 16px;"></i>
+                <span th:text="${category.name}">Category</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Promotional Banner -->
+    <div class="promo-banner">
+        <img src="https://cdnv2.tgdd.vn/mwg-static/common/Campaign/f5/79/f5798ef022fa392cfc67861af3495588.png"
+            alt="Khuyến mãi Tết"
+            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%221200%22 height=%22300%22%3E%3Crect fill=%22%23c92127%22 width=%221200%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2248%22 fill=%22%23ffcc00%22 font-weight=%22bold%22%3ETẾT AI SALE ĐẦY ƯP%3C/text%3E%3C/svg%3E'">
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="section-header">
+            <h2 class="section-title">
+                <i class="fas fa-box-open"></i> Danh Sách Sản Phẩm
+                <span th:if="${keyword}" style="color: #c92127; font-size: 16px;">
+                    - Kết quả tìm kiếm: "<span th:text="${keyword}"></span>"
+                </span>
+            </h2>
+            <a sec:authorize="hasAnyAuthority('ADMIN','MANAGER')" href="/products/add" class="add-btn">
+                <i class="fas fa-plus-circle"></i> Thêm sản phẩm
+            </a>
+        </div>
+
+        <!-- Product Type Tabs -->
+        <div class="product-tabs" th:unless="${keyword}">
+            <a href="/products?type=all" class="tab-btn"
+                th:classappend="${type == 'all' or type == null ? 'active' : ''}">
+                <i class="fas fa-th"></i> Tất cả sản phẩm
+            </a>
+            <a href="/products?type=discount" class="tab-btn" th:classappend="${type == 'discount' ? 'active' : ''}">
+                <i class="fas fa-star"></i> Sản phẩm khuyến mãi
+            </a>
+        </div>
+
+        <!-- Product Grid -->
+        <div th:if="${!products.empty}" class="product-grid">
+            <div th:each="product : ${products}" class="product-item">
+                <span class="promo-badge">HOT</span>
+                <img th:src="${product.imageUrl}" th:alt="${product.name}" class="product-image"
+                    onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2214%22 fill=%22%23999%22%3ENo Image%3C/text%3E%3C/svg%3E'">
+
+                <div class="product-info">
+                    <span class="product-category" th:text="${product.category?.name}">Danh mục</span>
+                    <div class="product-name" th:text="${product.name}">Tên sản phẩm</div>
+                    <div th:if="${product.discount != null and product.discount and product.promoPrice != null and product.promoQuantity != null and product.promoQuantity > 0}">
+                        <div class="product-price" style="display:inline-block; margin-bottom:5px;" th:text="${#numbers.formatDecimal(product.promoPrice, 0, 'COMMA', 0, 'POINT')} + '₫'"></div>
+                        <span style="text-decoration:line-through; color:#999; font-size:14px; margin-left:8px;" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'"></span>
+                        <div style="font-size:12px; color:#c92127; background:#ffe6e6; padding:2px 6px; border-radius:4px; display:inline-block; margin-bottom:15px;">Chỉ còn [[${product.promoQuantity}]] suất</div>
+                    </div>
+                    <div th:unless="${product.discount != null and product.discount and product.promoPrice != null and product.promoQuantity != null and product.promoQuantity > 0}">
+                        <div class="product-price" th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + '₫'">0₫</div>
+                    </div>
+
+                    <div class="product-actions" sec:authorize="hasAnyAuthority('ADMIN','MANAGER')">
+                        <a th:href="@{/products/edit/{id}(id=${product.id})}" class="btn-action btn-edit">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <a th:href="@{/products/delete/{id}(id=${product.id})}" class="btn-action btn-delete"
+                            onclick="return confirm('Xóa sản phẩm này?')">
+                            <i class="fas fa-trash"></i> Xóa
+                        </a>
+                    </div>
+                    <div class="product-actions" sec:authorize="!hasAnyAuthority('ADMIN','MANAGER')">
+                        <a th:href="@{/products/detail/{id}(id=${product.id})}" class="btn-action btn-edit"
+                            style="background: #28a745; color: white;">
+                            <i class="fas fa-eye"></i> Xem ngay
+                        </a>
+                        <a th:href="@{/cart/add/{id}(id=${product.id})}" class="btn-action btn-delete"
+                            style="background: #c92127; color: white; margin-left: auto; width: max-content;">
+                            <i class="fas fa-cart-plus"></i> Chọn Mua
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${products.empty}" class="empty-state">
+            <i class="fas fa-inbox"></i>
+            <h3 th:if="${keyword}">Không tìm thấy sản phẩm "<span th:text="${keyword}"></span>"</h3>
+            <h3 th:unless="${keyword}">Chưa có sản phẩm nào</h3>
+            <p>Hãy thêm sản phẩm đầu tiên của bạn!</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSubmenu(event, element) {
+            event.preventDefault(); // Prevent linking
+            event.stopPropagation(); // Prevent document click from closing it immediately
+
+            const parentItem = element.closest('.category-menu-item');
+            const isActive = parentItem.classList.contains('active');
+
+            // Close all other open submenus first
+            document.querySelectorAll('.category-menu-item.active').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // If it wasn't active, open it
+            if (!isActive) {
+                parentItem.classList.add('active');
+            }
+        }
+
+        // Close submenu when clicking outside
+        document.addEventListener('click', function (event) {
+            const isClickInsideMenu = event.target.closest('.category-menu-item');
+            if (!isClickInsideMenu) {
+                document.querySelectorAll('.category-menu-item.active').forEach(item => {
+                    item.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

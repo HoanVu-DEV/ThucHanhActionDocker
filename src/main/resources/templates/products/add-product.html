@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm Sản Phẩm - Thế Giới Di Động</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+
+        .top-banner {
+            background: linear-gradient(180deg, #c92127 0%, #d32f2f 100%);
+            padding: 8px 0;
+            text-align: center;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .main-header {
+            background: #ffcc00;
+            padding: 12px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #c92127;
+            text-decoration: none;
+        }
+
+        .back-btn {
+            background: white;
+            color: #c92127;
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            background: #f5f5f5;
+            color: #c92127;
+        }
+
+        .page-title {
+            flex: 1;
+            font-size: 18px;
+            font-weight: bold;
+            color: #c92127;
+        }
+
+        .form-container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        .form-card {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .required {
+            color: #c92127;
+        }
+
+        .form-control,
+        .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: #ffcc00;
+            box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.1);
+        }
+
+        .category-wrapper {
+            position: relative;
+        }
+
+        .quick-add-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #ffcc00;
+            color: #333;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .quick-add-btn:hover {
+            background: #e6b800;
+        }
+
+        .quick-category-form {
+            display: none;
+            background: #fffef7;
+            border: 2px solid #ffcc00;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .quick-category-form.show {
+            display: block;
+        }
+
+        .input-group-custom {
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-group-custom input {
+            flex: 1;
+        }
+
+        .image-upload-zone {
+            border: 2px dashed #ffcc00;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background: #fffef7;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .image-upload-zone:hover {
+            background: #fff9e6;
+            border-color: #e6b800;
+        }
+
+        .image-upload-zone i {
+            font-size: 48px;
+            color: #c92127;
+            margin-bottom: 10px;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            margin-top: 15px;
+            display: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-submit {
+            background: #c92127;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: #a01b20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(201, 33, 39, 0.3);
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-cancel:hover {
+            background: #5a6268;
+            color: white;
+        }
+
+        .error-message {
+            color: #c92127;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            border-left: 4px solid #c92127;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .form-card {
+                padding: 20px;
+            }
+
+            .quick-add-btn {
+                position: static;
+                transform: none;
+                width: 100%;
+                margin-top: 8px;
+            }
+        }
+
+        /* ========== ANIMATIONS ========== */
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+
+            to {
+                opacity: 1;
+                max-height: 200px;
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .main-header {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .form-container {
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .form-section {
+            animation: slideUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .form-section:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .form-section:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .form-section:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .form-section:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        .form-section:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+        .form-section:nth-child(6) {
+            animation-delay: 0.35s;
+        }
+
+        .quick-category-form.show {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .image-preview {
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .btn-submit,
+        .btn-cancel {
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:active {
+            animation: pulse 0.3s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            animation: pulse 0.3s;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top-banner">
+        <i class="fas fa-plus-circle"></i> THÊM SẢN PHẨM MỚI VÀO HỆ THỐNG
+    </div>
+
+    <div class="main-header">
+        <div class="header-container">
+            <a href="/products" class="logo">
+                <i class="fas fa-mobile-alt"></i>
+                <span>thegioididong</span>
+            </a>
+            <div class="page-title">Thêm Sản Phẩm Mới</div>
+            <a href="/products" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <div th:if="${error}" class="alert-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Lỗi:</strong> <span th:text="${error}"></span>
+        </div>
+
+        <div class="form-card">
+            <form th:action="@{/products/add}" th:object="${product}" method="post" enctype="multipart/form-data">
+
+                <div class="form-section">
+                    <label for="name" class="form-label">
+                        Tên Sản Phẩm <span class="required">*</span>
+                    </label>
+                    <input type="text" class="form-control" id="name" th:field="*{name}"
+                        placeholder="VD: iPhone 15 Pro Max 256GB" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+                </div>
+
+                <div class="form-section">
+                    <label for="price" class="form-label">
+                        Giá Bán (VNĐ) <span class="required">*</span>
+                    </label>
+                    <input type="number" class="form-control" id="price" th:field="*{price}" placeholder="VD: 29990000"
+                        step="1000" min="0" required>
+                    <div class="error-message" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+                </div>
+
+                <div class="form-section">
+                    <label for="category" class="form-label">
+                        Danh Mục <span class="required">*</span>
+                    </label>
+                    <div class="category-wrapper">
+                        <select class="form-select" id="category" th:field="*{category}" required
+                            style="padding-right: 120px;">
+                            <option value="">-- Chọn danh mục --</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}">Category
+                            </option>
+                        </select>
+                        <button type="button" class="quick-add-btn" onclick="toggleQuickCategory()">
+                            <i class="fas fa-plus"></i> Thêm mới
+                        </button>
+                    </div>
+
+                    <div id="quickCategoryForm" class="quick-category-form">
+                        <div class="input-group-custom">
+                            <input type="text" id="newCategoryName" class="form-control"
+                                placeholder="Nhập tên danh mục mới...">
+                            <button type="button" class="btn-submit" onclick="createCategory()"
+                                style="padding: 8px 16px;">
+                                <i class="fas fa-check"></i> Lưu
+                            </button>
+                            <button type="button" class="btn-cancel" onclick="toggleQuickCategory()"
+                                style="padding: 8px 16px;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="categoryError" class="error-message" style="display: none;"></div>
+                    </div>
+
+                    <div class="error-message" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></div>
+                </div>
+
+                <div class="form-section">
+                    <label for="description" class="form-label">
+                        Mô Tả Sản Phẩm
+                    </label>
+                    <textarea class="form-control" id="description" th:field="*{description}" rows="4"
+                        placeholder="Nhập mô tả chi tiết về sản phẩm..."></textarea>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">
+                        <input type="checkbox" id="discount" th:field="*{discount}" style="width: auto; margin-right: 8px;" onchange="togglePromoFields()">
+                        <span>Đánh dấu sản phẩm khuyến mãi</span>
+                    </label>
+                    <small class="text-muted d-block mt-2 mb-3">Sản phẩm được đánh dấu sẽ hiển thị trong tab "Sản phẩm khuyến mãi"</small>
+                    
+                    <div id="promoFields" style="display: none; background: #fff9e6; border: 1px solid #ffcc00; padding: 15px; border-radius: 6px;">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label for="promoPrice" class="form-label">Giá khuyến mãi (VNĐ)</label>
+                                <input type="number" class="form-control" id="promoPrice" th:field="*{promoPrice}" min="0" step="1000">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="promoQuantity" class="form-label">Số lượng áp dụng</label>
+                                <input type="number" class="form-control" id="promoQuantity" th:field="*{promoQuantity}" min="0">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <label class="form-label">
+                        Hình Ảnh Sản Phẩm
+                    </label>
+                    <div class="image-upload-zone" onclick="document.getElementById('imageFile').click()">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <h5>Click để chọn ảnh</h5>
+                        <p class="text-muted mb-0">Hỗ trợ: JPG, PNG, GIF</p>
+                    </div>
+                    <input type="file" id="imageFile" name="imageFile" accept="image/*" onchange="previewImage(event)"
+                        style="display: none;">
+                    <img id="imagePreview" class="image-preview" alt="Preview">
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> Lưu Sản Phẩm
+                    </button>
+                    <a href="/products" class="btn-cancel">
+                        <i class="fas fa-times"></i> Hủy Bỏ
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function previewImage(event) {
+            const preview = document.getElementById('imagePreview');
+            const file = event.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
+        function toggleQuickCategory() {
+            const form = document.getElementById('quickCategoryForm');
+            form.classList.toggle('show');
+            if (form.classList.contains('show')) {
+                document.getElementById('newCategoryName').focus();
+            }
+        }
+
+        async function createCategory() {
+            const nameInput = document.getElementById('newCategoryName');
+            const categoryName = nameInput.value.trim();
+            const errorDiv = document.getElementById('categoryError');
+
+            if (!categoryName) {
+                errorDiv.textContent = 'Vui lòng nhập tên danh mục';
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/categories', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: categoryName })
+                });
+
+                if (response.ok) {
+                    const newCategory = await response.json();
+                    const select = document.getElementById('category');
+                    const option = new Option(newCategory.name, newCategory.id, true, true);
+                    select.add(option);
+                    nameInput.value = '';
+                    toggleQuickCategory();
+                    errorDiv.style.display = 'none';
+                    alert('✅ Đã thêm danh mục: ' + newCategory.name);
+                } else {
+                    const error = await response.text();
+                    errorDiv.textContent = error;
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Lỗi kết nối: ' + error.message;
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        document.getElementById('newCategoryName').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                createCategory();
+            }
+        });
+
+        // Toggle Promo fields visibility
+        function togglePromoFields() {
+            const isDiscount = document.getElementById('discount').checked;
+            const promoDiv = document.getElementById('promoFields');
+            if (isDiscount) {
+                promoDiv.style.display = 'block';
+            } else {
+                promoDiv.style.display = 'none';
+                document.getElementById('promoPrice').value = '';
+                document.getElementById('promoQuantity').value = '';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            togglePromoFields();
+        });
+    </script>
+</body>
+
+</html>
