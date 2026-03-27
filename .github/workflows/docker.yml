@@ -27,13 +27,21 @@ jobs:
 
       - name: Deploy to DevOps Classroom
         run: |
+          set -euo pipefail
+
           REPO="${{ secrets.DOCKER_USERNAME }}/demo-app"
           TAG="latest"
           CONTAINER_PORT=8080
 
+          echo "Deploy target:"
+          echo "  repo=$REPO"
+          echo "  tag=$TAG"
+          echo "  slot=7"
+          echo "  container_port=$CONTAINER_PORT"
+
           RESPONSE=$(curl -m 1200 -sS -w "\n%{http_code}" -X POST "${{ secrets.DEPLOY_URL }}?repo=$REPO&tag=$TAG&slot=7&container_port=$CONTAINER_PORT&strict_container_port=0")
 
-          BODY=$(echo "$RESPONSE" | sed "$d")
+          BODY=$(echo "$RESPONSE" | sed '$d')
           CODE=$(echo "$RESPONSE" | tail -n1)
 
           echo "HTTP Code: $CODE"
