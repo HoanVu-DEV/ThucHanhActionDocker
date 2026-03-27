@@ -27,7 +27,7 @@ jobs:
 
       - name: Deploy to DevOps Classroom
         run: |
-          REPO="hoanvu2/demo-app"
+          REPO="${{ secrets.DOCKER_USERNAME }}/demo-app"
           TAG="latest"
           CONTAINER_PORT=80
 
