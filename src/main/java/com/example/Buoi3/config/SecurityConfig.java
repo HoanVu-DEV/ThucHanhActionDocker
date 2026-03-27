@@ -26,13 +26,13 @@ public class SecurityConfig {
             .formLogin(form -> form
                 .loginPage("/login")
                 .loginProcessingUrl("/login-process")
-                .defaultSuccessUrl("/products", true)
+                .defaultSuccessUrl("/", true)
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
             .logout(logout -> logout
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("/products")
+                .logoutSuccessUrl("/")
                 .permitAll()
             )
             .exceptionHandling(ex -> ex

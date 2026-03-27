@@ -22,9 +22,8 @@ public class ProductController {
     private final CategoryService categoryService;
 
     @GetMapping("/")
-    @ResponseBody
-    public String home() {
-        return "OK";
+    public String home(Model model) {
+        return listProducts(null, "all", null, model);
     }
 
     @GetMapping("/products")
