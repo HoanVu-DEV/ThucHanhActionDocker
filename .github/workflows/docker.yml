@@ -31,7 +31,7 @@ jobs:
       # 4. Deploy qua webhook
       - name: Deploy to DevOps Classroom
         run: |
-          REPO="trinhhoanvu"
+          REPO="demo-app"
           TAG="latest"
           CONTAINER_PORT=80
 
