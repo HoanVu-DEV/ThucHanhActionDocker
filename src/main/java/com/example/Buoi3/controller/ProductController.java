@@ -22,8 +22,9 @@ public class ProductController {
     private final CategoryService categoryService;
 
     @GetMapping("/")
+    @ResponseBody
     public String home() {
-        return "redirect:/products";
+        return "OK";
     }
 
     @GetMapping("/products")
