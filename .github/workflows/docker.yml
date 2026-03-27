@@ -23,7 +23,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: hoanvu2/demo-app:latest
+          tags: ${{ secrets.DOCKER_USERNAME }}/demo-app:latest
 
       - name: Deploy to DevOps Classroom
         run: |

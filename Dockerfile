@@ -1,13 +1,17 @@
-FROM maven:3.9.11-eclipse-temurin-21 AS builder
+FROM maven:3.9.11-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY . .
-# Biên dịch code thành file .jar (bỏ qua chạy thửtest để build nhanh)
-RUN mvn package -DskipTests
+
+COPY pom.xml ./
+RUN mvn -q -DskipTests dependency:go-offline
+
+COPY src ./src
+RUN mvn -q -DskipTests package
 
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
-# Chỉ lấy file .jar từ builder (GĐ1)
-COPY --from=builder /app/target/*.jar app.jar
+
+COPY --from=build /app/target/*.jar app.jar
+
 EXPOSE 8080
-# Lệnh "bật công tắc" để chạy ứng dụng
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
