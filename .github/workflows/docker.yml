@@ -27,7 +27,7 @@ jobs:
 
       - name: Deploy to DevOps Classroom
         run: |
-          REPO="layers/hoanvu2"
+          REPO="demo-app"
           TAG="latest"
           CONTAINER_PORT=80
 
