@@ -1,6 +1,7 @@
 package com.example.Buoi3.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -11,8 +12,17 @@ public class DatabaseRepairRunner implements CommandLineRunner {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    @Autowired
+    private Environment environment;
+
     @Override
     public void run(String... args) throws Exception {
+        String driver = environment.getProperty("spring.datasource.driver-class-name", "");
+        if (driver.contains("org.h2.Driver")) {
+            System.out.println("Skipping SQL Server schema repair on H2.");
+            return;
+        }
+
         try {
             // Check and add 'phone' column
             jdbcTemplate.execute("IF COL_LENGTH('orders', 'phone') IS NULL ALTER TABLE orders ADD phone VARCHAR(255)");

@@ -143,7 +143,7 @@ public class OrderController {
         } catch (Exception e) {
             e.printStackTrace();
             model.addAttribute("error", e.getMessage());
-            return "redirect:/order/checkout?error=true";
+            return "products/checkout";
         }
     }
 
