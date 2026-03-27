@@ -8,8 +8,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/points")
@@ -27,7 +29,6 @@ public class PointsController {
         return null;
     }
 
-    /** Trang đổi điểm - chỉ USER */
     @GetMapping("/redeem")
     public String redeemPage(Model model) {
         User user = getCurrentUser();
@@ -45,10 +46,8 @@ public class PointsController {
         return "points/redeem";
     }
 
-    /** Bước 1: Gửi OTP về email */
     @PostMapping("/send-otp")
-    public String sendOtp(@RequestParam("redeemPairs") int redeemPairs,
-                          RedirectAttributes ra) {
+    public String sendOtp(@RequestParam("redeemPairs") int redeemPairs, Model model) {
         User user = getCurrentUser();
         if (user == null) return "redirect:/login";
 
@@ -56,30 +55,37 @@ public class PointsController {
         int maxPairs = points / 2;
 
         if (redeemPairs <= 0 || redeemPairs > maxPairs) {
-            ra.addFlashAttribute("error", "Số điểm không hợp lệ!");
-            return "redirect:/points/redeem";
+            model.addAttribute("error", "So diem khong hop le!");
+            model.addAttribute("user", user);
+            model.addAttribute("points", points);
+            model.addAttribute("maxPairs", maxPairs);
+            model.addAttribute("maxDiscount", maxPairs * 15000.0);
+            model.addAttribute("otpSent", false);
+            return "points/redeem";
         }
 
         try {
             otpService.generateAndSendOtp(user.getUsername(), user.getEmail());
-            ra.addFlashAttribute("otpSent", true);
-            ra.addFlashAttribute("redeemPairs", redeemPairs);
-            ra.addFlashAttribute("success", "✅ Mã OTP đã được gửi tới email: " + user.getEmail());
-            return "redirect:/points/verify";
+            model.addAttribute("otpSent", true);
+            model.addAttribute("redeemPairs", redeemPairs);
+            model.addAttribute("success", "Ma OTP da duoc gui toi email: " + user.getEmail());
+            model.addAttribute("user", user);
+            return "points/verify-otp";
         } catch (Exception e) {
-            e.printStackTrace();
-            ra.addFlashAttribute("error", "❌ Không thể gửi email OTP: " + e.getMessage());
-            return "redirect:/points/redeem";
+            model.addAttribute("error", "Khong the gui email OTP: " + e.getMessage());
+            model.addAttribute("user", user);
+            model.addAttribute("points", points);
+            model.addAttribute("maxPairs", maxPairs);
+            model.addAttribute("maxDiscount", maxPairs * 15000.0);
+            model.addAttribute("otpSent", false);
+            return "points/redeem";
         }
     }
 
-    /** Trang nhập OTP */
     @GetMapping("/verify")
     public String verifyPage(Model model) {
         User user = getCurrentUser();
         if (user == null) return "redirect:/login";
-
-        // If no OTP was sent (no flash attributes), redirect back to redeem
         if (!model.containsAttribute("redeemPairs")) {
             return "redirect:/points/redeem";
         }
@@ -87,23 +93,22 @@ public class PointsController {
         return "points/verify-otp";
     }
 
-    /** Bước 2: Xác thực OTP và đổi điểm */
     @PostMapping("/confirm")
     public String confirmRedeem(@RequestParam("otp") String otp,
                                 @RequestParam("redeemPairs") int redeemPairs,
-                                RedirectAttributes ra) {
+                                Model model) {
         User user = getCurrentUser();
         if (user == null) return "redirect:/login";
 
         boolean valid = otpService.validateOtp(user.getUsername(), otp);
         if (!valid) {
-            ra.addFlashAttribute("error", "Mã OTP không đúng hoặc đã hết hạn!");
-            ra.addFlashAttribute("otpSent", true);
-            ra.addFlashAttribute("redeemPairs", redeemPairs);
-            return "redirect:/points/verify";
+            model.addAttribute("error", "Ma OTP khong dung hoac da het han!");
+            model.addAttribute("otpSent", true);
+            model.addAttribute("redeemPairs", redeemPairs);
+            model.addAttribute("user", user);
+            return "points/verify-otp";
         }
 
-        // Deduct points
         int currentPoints = user.getRewardPoints() != null ? user.getRewardPoints() : 0;
         int pointsToUse = redeemPairs * 2;
         if (pointsToUse > currentPoints) pointsToUse = currentPoints;
@@ -112,9 +117,10 @@ public class PointsController {
         user.setRewardPoints(currentPoints - pointsToUse);
         userRepository.save(user);
 
-        ra.addFlashAttribute("successMsg",
-            "Đổi điểm thành công! Bạn đã dùng " + pointsToUse + " điểm để nhận giảm giá " +
-            String.format("%,.0f", discountValue) + "₫. Điểm còn lại: " + user.getRewardPoints());
-        return "redirect:/points/redeem";
+        model.addAttribute("successMsg",
+            "Doi diem thanh cong! Ban da dung " + pointsToUse + " diem de nhan giam gia " +
+            String.format("%,.0f", discountValue) + "d. Diem con lai: " + user.getRewardPoints());
+        model.addAttribute("user", user);
+        return "points/redeem";
     }
 }
