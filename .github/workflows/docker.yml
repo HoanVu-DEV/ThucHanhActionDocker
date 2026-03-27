@@ -1,4 +1,4 @@
-name: CI/CD Docker Deploy
+name: Build, Push and Deploy
 
 on:
   push:
@@ -9,35 +9,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout code
-      - name: Checkout source
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2. Login Docker Hub
-      - name: Login Docker Hub
+      - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # 3. Build & Push image
-      - name: Build and Push Docker Image
+      - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: hoanvu2/demo-app:latest
 
-      # 4. Deploy qua webhook
       - name: Deploy to DevOps Classroom
         run: |
-          REPO="demo-app"
+          REPO="layers/hoanvu2"
           TAG="latest"
           CONTAINER_PORT=80
 
-          echo "🚀 Đang deploy..."
-
-          RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST "${{ secrets.DEPLOY_URL }}?repo=$REPO&tag=$TAG&slot=1&container_port=$CONTAINER_PORT&strict_container_port=0")
+          RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST "${{ secrets.DEPLOY_URL }}?repo=$REPO&tag=$TAG&slot=7&container_port=$CONTAINER_PORT&strict_container_port=0")
 
           BODY=$(echo "$RESPONSE" | sed "$d")
           CODE=$(echo "$RESPONSE" | tail -n1)
@@ -49,8 +43,8 @@ jobs:
           echo "::endgroup::"
 
           if [ "$CODE" -lt 200 ] || [ "$CODE" -ge 300 ]; then
-            echo "❌ Deploy thất bại!"
+            echo "Deploy failed"
             exit 1
           fi
 
-          echo "✅ Deploy thành công!"
+          echo "Deploy success"
