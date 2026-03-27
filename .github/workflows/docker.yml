@@ -31,7 +31,7 @@ jobs:
 
           REPO="${{ secrets.DOCKER_USERNAME }}/demo-app"
           TAG="latest"
-          CONTAINER_PORT=8080
+          CONTAINER_PORT=80
           MAX_RETRIES=3
 
           echo "Deploy target:"
