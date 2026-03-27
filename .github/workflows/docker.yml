@@ -31,7 +31,7 @@ jobs:
           TAG="latest"
           CONTAINER_PORT=8080
 
-          RESPONSE=$(curl -m 60 -sS -w "\n%{http_code}" -X POST "${{ secrets.DEPLOY_URL }}?repo=$REPO&tag=$TAG&slot=7&container_port=$CONTAINER_PORT&strict_container_port=0")
+          RESPONSE=$(curl -m 1200 -sS -w "\n%{http_code}" -X POST "${{ secrets.DEPLOY_URL }}?repo=$REPO&tag=$TAG&slot=7&container_port=$CONTAINER_PORT&strict_container_port=0")
 
           BODY=$(echo "$RESPONSE" | sed "$d")
           CODE=$(echo "$RESPONSE" | tail -n1)
