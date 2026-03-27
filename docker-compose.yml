@@ -19,6 +19,13 @@ services:
       - "8080:8080"
     depends_on:
       - sqlserver
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName=ShopDB;encrypt=true;trustServerCertificate=true
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: YourStrong@123
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.microsoft.sqlserver.jdbc.SQLServerDriver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.SQLServerDialect
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
 
 volumes:
   sql_data:
